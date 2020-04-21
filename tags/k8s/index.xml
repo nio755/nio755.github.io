@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>k8s on nio`s Blog</title>
+    <link>https://nio755.github.io/tags/k8s/</link>
+    <description>Recent content in k8s on nio`s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 20 Apr 2020 09:08:00 +0800</lastBuildDate>
+    
+	<atom:link href="https://nio755.github.io/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>在 vmware 中使用 kubeadm 搭建 Kubernetes 集群</title>
+      <link>https://nio755.github.io/posts/k8s/k8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link>
+      <pubDate>Mon, 20 Apr 2020 09:08:00 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/posts/k8s/k8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid>
+      <description>部署环境 安装 kubeadm,kubelet,kubectl(当前版本 1.17.3) 关闭防火墙 关闭 swap 安装 docker(当前版本 19.03.4) 安装方法 方法 1-官方安装步</description>
+    </item>
+    
+  </channel>
+</rss>

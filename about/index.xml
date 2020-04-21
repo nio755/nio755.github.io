@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Abouts on nio`s Blog</title>
+    <link>https://nio755.github.io/about/</link>
+    <description>Recent content in Abouts on nio`s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 19 Apr 2020 20:44:07 +0800</lastBuildDate>
+    
+	<atom:link href="https://nio755.github.io/about/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Desc</title>
+      <link>https://nio755.github.io/about/desc/</link>
+      <pubDate>Sun, 19 Apr 2020 20:44:07 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/about/desc/</guid>
+      <description>Hi, my name is nio.
+This is my blog.</description>
+    </item>
+    
+  </channel>
+</rss>

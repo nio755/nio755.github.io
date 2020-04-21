@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GoLang on nio`s Blog</title>
+    <link>https://nio755.github.io/categories/golang/</link>
+    <description>Recent content in GoLang on nio`s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 19 Apr 2020 20:44:45 +0800</lastBuildDate>
+    
+	<atom:link href="https://nio755.github.io/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GoLang 逃逸分析</title>
+      <link>https://nio755.github.io/posts/golang/golang%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</link>
+      <pubDate>Sun, 19 Apr 2020 20:44:45 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/posts/golang/golang%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</guid>
+      <description>介绍 逃逸场景 指针逃逸 栈空间不足逃逸（空间开辟过大） 动态类型逃逸（不确定长度大小） 闭包引用对象逃逸 逃逸分析的作用 逃逸总结 函数传递指针真的比传值</description>
+    </item>
+    
+  </channel>
+</rss>
