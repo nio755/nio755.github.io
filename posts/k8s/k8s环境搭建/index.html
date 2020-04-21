@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+在 vmware 中使用 kubeadm 搭建 Kubernetes 集群
+</title>
+
+    
+  <link href="./favicon-32.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+
+  
+  <meta name="author" content="nio" />
+  <meta name="description" content="部署环境 安装 kubeadm,kubelet,kubectl(当前版本 1.17.3) 关闭防火墙 关闭 swap 安装 docker(当前版本 19.03.4) 安装方法 方法 1-官方安装步" />
+
+
+
+<meta name="generator" content="Hugo 0.69.0" />
+
+<link rel="canonical" href="https://nio755.github.io/posts/k8s/k8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" />
+
+
+<meta property="og:title" content="在 vmware 中使用 kubeadm 搭建 Kubernetes 集群" />
+<meta property="og:description" content="部署环境 安装 kubeadm,kubelet,kubectl(当前版本 1.17.3) 关闭防火墙 关闭 swap 安装 docker(当前版本 19.03.4) 安装方法 方法 1-官方安装步" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://nio755.github.io/posts/k8s/k8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" />
+<meta property="article:published_time" content="2020-04-20T09:08:00+08:00" />
+<meta property="article:modified_time" content="2020-04-20T09:08:00+08:00" />
+
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="在 vmware 中使用 kubeadm 搭建 Kubernetes 集群"/>
+<meta name="twitter:description" content="部署环境 安装 kubeadm,kubelet,kubectl(当前版本 1.17.3) 关闭防火墙 关闭 swap 安装 docker(当前版本 19.03.4) 安装方法 方法 1-官方安装步"/>
+
+
+<link rel="stylesheet" href="/css/github-markdown.css" />
+<link rel="stylesheet" href="/css/semantic.min.css" />
+<link rel="stylesheet" href="/css/site.css" />
+
+
+
+
+
+  </head>
+
+  
+  <body>
+  
+    <div class="flip-container">
+      <div class="flipper">
+        <section class="front">
+          
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/nio755.github.io\/'"></i>
+  </div>
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+</nav>
+
+          
+<div class="ui centered relaxed grid dream-grid">
+  <div class="sixteen wide mobile sixteen wide tablet twelve wide computer column markdown-body dream-single">
+
+    <section class="ui top attached segment" id="dream-save-post-as-img">
+      <header style="margin-top: 0 !important;">
+        <h2 class="ui header">
+          在 vmware 中使用 kubeadm 搭建 Kubernetes 集群
+          <div class="sub header">@ nio · Monday, Apr 20, 2020 · 6 分钟阅读 · 更新于 Apr 20, 2020</div>
+        </h2>
+      </header>
+      <article style="margin-top: 2rem;"><ul>
+<li><a href="#%e9%83%a8%e7%bd%b2%e7%8e%af%e5%a2%83">部署环境</a></li>
+<li><a href="#%e5%ae%89%e8%a3%85-kubeadmkubeletkubectl%e5%bd%93%e5%89%8d%e7%89%88%e6%9c%ac-1173">安装 kubeadm,kubelet,kubectl(当前版本 1.17.3)</a>
+<ul>
+<li><a href="#%e5%85%b3%e9%97%ad%e9%98%b2%e7%81%ab%e5%a2%99">关闭防火墙</a></li>
+<li><a href="#%e5%85%b3%e9%97%ad-swap">关闭 swap</a></li>
+<li><a href="#%e5%ae%89%e8%a3%85-docker%e5%bd%93%e5%89%8d%e7%89%88%e6%9c%ac-19034">安装 docker(当前版本 19.03.4)</a></li>
+<li><a href="#%e5%ae%89%e8%a3%85%e6%96%b9%e6%b3%95">安装方法</a>
+<ul>
+<li><a href="#%e6%96%b9%e6%b3%95-1-%e5%ae%98%e6%96%b9%e5%ae%89%e8%a3%85%e6%ad%a5%e9%aa%a4%e9%85%8d%e7%bd%ae%e4%bb%a3%e7%90%86">方法 1-官方安装步骤(配置代理)</a></li>
+<li><a href="#%e6%96%b9%e6%b3%95-2-%e4%bd%bf%e7%94%a8%e9%98%bf%e9%87%8c%e4%ba%91%e9%95%9c%e5%83%8f%e7%ab%99">方法 2-使用阿里云镜像站</a></li>
+</ul>
+</li>
+<li><a href="#%e9%85%8d%e7%bd%ae-cgroup-driver">配置 cgroup-driver</a></li>
+</ul>
+</li>
+<li><a href="#%e9%83%a8%e7%bd%b2%e9%9b%86%e7%be%a4">部署集群</a>
+<ul>
+<li><a href="#docker-%e6%8b%89%e5%8f%96%e9%95%9c%e5%83%8f%e9%85%8d%e7%bd%ae">docker 拉取镜像配置</a>
+<ul>
+<li><a href="#%e6%96%b9%e6%b3%95-1-%e4%bd%bf%e7%94%a8-docker-%e4%bb%a3%e7%90%86">方法 1-使用 docker 代理</a></li>
+<li><a href="#%e6%96%b9%e6%b3%95-2-%e6%8b%89%e5%8f%96%e9%98%bf%e9%87%8c%e4%ba%91%e9%95%9c%e5%83%8f">方法 2-拉取阿里云镜像</a></li>
+</ul>
+</li>
+<li><a href="#%e9%85%8d%e7%bd%ae-master-%e8%8a%82%e7%82%b9">配置 Master 节点</a>
+<ul>
+<li><a href="#init">init</a></li>
+<li><a href="#%e5%ae%89%e8%a3%85-pod-%e7%bd%91%e7%bb%9c%e9%99%84%e5%8a%a0%e7%bb%84%e4%bb%b6">安装 Pod 网络附加组件</a></li>
+</ul>
+</li>
+<li><a href="#%e9%85%8d%e7%bd%ae-slave-%e8%8a%82%e7%82%b9">配置 Slave 节点</a>
+<ul>
+<li><a href="#%e9%85%8d%e7%bd%ae-hostname">配置 hostname</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%e5%85%b6%e4%bb%96">其他</a>
+<ul>
+<li><a href="#kubeadm-%e9%9b%86%e7%be%a4%e7%9a%84%e9%ab%98%e5%8f%af%e7%94%a8">kubeadm 集群的高可用</a></li>
+<li><a href="#%e5%8d%95%e6%9c%ba%e9%9b%86%e7%be%a4">单机集群</a></li>
+<li><a href="#%e5%b0%86-api-%e6%9c%8d%e5%8a%a1%e5%99%a8%e4%bb%a3%e7%90%86%e5%88%b0%e6%9c%ac%e5%9c%b0%e4%b8%bb%e6%9c%ba">将 API 服务器代理到本地主机</a></li>
+<li><a href="#%e6%b8%85%e7%90%86">清理</a>
+<ul>
+<li><a href="#%e5%88%a0%e9%99%a4%e8%8a%82%e7%82%b9">删除节点</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%e5%8f%82%e8%80%83">参考</a></li>
+</ul>
+<h2 id="部署环境">部署环境</h2>
+<ul>
+<li>vmware15</li>
+<li>三台虚拟机(使用静态 IP)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ip</th>
+<th>资源配置</th>
+<th>系统镜像</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.201</td>
+<td>CPU 2 核、内存 4G、硬盘 20G</td>
+<td>Ubuntu18.4.2</td>
+<td>Master</td>
+</tr>
+<tr>
+<td>192.168.1.202</td>
+<td>CPU 2 核、内存 2G、硬盘 20G</td>
+<td>Ubuntu18.4.2</td>
+<td>Slave</td>
+</tr>
+<tr>
+<td>192.168.1.202</td>
+<td>CPU 2 核、内存 2G、硬盘 20G</td>
+<td>Ubuntu18.4.2</td>
+<td>Slave</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>保证集群中每个节点间的网络连通性</li>
+<li>每个节点拥有唯一的 MAC 地址，hostname 和 product_uuid</li>
+<li>保证所需端口的打开，这里我选择直接关闭防火墙。<a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports">参考</a></li>
+<li><strong>关闭 swap</strong>，官方建议<strong>必须禁用</strong>swap 以使 kubelet 正常工作</li>
+</ul>
+<h2 id="安装-kubeadmkubeletkubectl当前版本-1173">安装 kubeadm,kubelet,kubectl(当前版本 1.17.3)</h2>
+<p>可使用虚拟机克隆进行三台机器的安装，<strong>要修改克隆节点的 ip</strong></p>
+<h3 id="关闭防火墙">关闭防火墙</h3>
+<p>根据当前的防火墙配置(SELinux、Netfilter、iptables、firewall 和 UFW)选择关闭或配置相应的防火墙策略</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 如果存在firewalld:</span>
+sudo systemctl stop firewalld <span style="color:#f92672">&amp;&amp;</span> sudo systemctl disable firewalld
+
+<span style="color:#75715e"># 如果存在ufw：</span>
+sudo ufw disable
+</code></pre></div><h3 id="关闭-swap">关闭 swap</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 删除swap的所有内容</span>
+swapoff -a
+
+<span style="color:#75715e"># 删除swap挂载，保证永久关闭</span>
+<span style="color:#75715e"># 注释swap所在的行</span>
+vim /etc/fstab
+</code></pre></div><h3 id="安装-docker当前版本-19034">安装 docker(当前版本 19.03.4)</h3>
+<p>采用 k8s 官方的<a href="https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker">安装步骤</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># Install Docker CE</span>
+<span style="color:#75715e">## Set up the repository:</span>
+<span style="color:#75715e">### Install packages to allow apt to use a repository over HTTPS</span>
+apt-get update <span style="color:#f92672">&amp;&amp;</span> apt-get install -y <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>  apt-transport-https ca-certificates curl software-properties-common gnupg2
+
+<span style="color:#75715e">### Add Docker’s official GPG key</span>
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+<span style="color:#75715e">### Add Docker apt repository.</span>
+add-apt-repository <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#34;deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+</span><span style="color:#e6db74">  </span><span style="color:#66d9ef">$(</span>lsb_release -cs<span style="color:#66d9ef">)</span><span style="color:#e6db74"> \
+</span><span style="color:#e6db74">  stable&#34;</span>
+
+<span style="color:#75715e">## Install Docker CE.</span>
+apt-get update <span style="color:#f92672">&amp;&amp;</span> apt-get install -y <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>  containerd.io<span style="color:#f92672">=</span>1.2.10-3 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>  docker-ce<span style="color:#f92672">=</span>5:19.03.4~3-0~ubuntu-<span style="color:#66d9ef">$(</span>lsb_release -cs<span style="color:#66d9ef">)</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>  docker-ce-cli<span style="color:#f92672">=</span>5:19.03.4~3-0~ubuntu-<span style="color:#66d9ef">$(</span>lsb_release -cs<span style="color:#66d9ef">)</span>
+
+<span style="color:#75715e"># Setup daemon.</span>
+cat &gt; /etc/docker/daemon.json <span style="color:#e6db74">&lt;&lt;EOF
+</span><span style="color:#e6db74">{
+</span><span style="color:#e6db74">  &#34;exec-opts&#34;: [&#34;native.cgroupdriver=systemd&#34;],
+</span><span style="color:#e6db74">  &#34;log-driver&#34;: &#34;json-file&#34;,
+</span><span style="color:#e6db74">  &#34;log-opts&#34;: {
+</span><span style="color:#e6db74">    &#34;max-size&#34;: &#34;100m&#34;
+</span><span style="color:#e6db74">  },
+</span><span style="color:#e6db74">  &#34;storage-driver&#34;: &#34;overlay2&#34;
+</span><span style="color:#e6db74">}
+</span><span style="color:#e6db74">EOF</span>
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+<span style="color:#75715e"># Restart docker.</span>
+systemctl daemon-reload
+systemctl restart docker
+</code></pre></div><h3 id="安装方法">安装方法</h3>
+<h4 id="方法-1-官方安装步骤配置代理">方法 1-官方安装步骤(配置代理)</h4>
+<p>配置 apt 代理</p>
+<p>参考<a href="https://blog.csdn.net/u013063153/article/details/64440513">ubuntu apt 代理设置</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 新建或修改apt.conf</span>
+vim /etc/apt/apt.conf
+
+<span style="color:#75715e"># 加入代理规则(http或socks5),当前http</span>
+Acquire::http::proxy <span style="color:#e6db74">&#34;http://ip:port/&#34;</span>;
+Acquire::ftp::proxy <span style="color:#e6db74">&#34;http://ip:port/&#34;</span>;
+Acquire::https::proxy <span style="color:#e6db74">&#34;http://ip:port/&#34;</span>;
+</code></pre></div><p>更新源并安装</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">sudo apt-get update <span style="color:#f92672">&amp;&amp;</span> sudo apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+cat <span style="color:#e6db74">&lt;&lt;EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+</span><span style="color:#e6db74">deb https://apt.kubernetes.io/ kubernetes-xenial main
+</span><span style="color:#e6db74">EOF</span>
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+</code></pre></div><h4 id="方法-2-使用阿里云镜像站">方法 2-使用阿里云镜像站</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">apt-get update <span style="color:#f92672">&amp;&amp;</span> apt-get install -y apt-transport-https
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+cat <span style="color:#e6db74">&lt;&lt;EOF &gt;/etc/apt/sources.list.d/kubernetes.list
+</span><span style="color:#e6db74">deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+</span><span style="color:#e6db74">EOF</span>
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+</code></pre></div><h3 id="配置-cgroup-driver">配置 cgroup-driver</h3>
+<p>在<code>/etc/systemd/system/kubelet.service.d/10-kubeadm.conf</code>文件中追加<code>--cgroup-driver=systemd</code></p>
+<p><img src="../img/10-kubeadm.conf.png" alt="10-kubeadm.conf.png"></p>
+<p>改为：<code>Environment=&quot;KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --cgroup-driver=systemd&quot;</code></p>
+<p>保存重启</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">systemctl daemon-reload
+systemctl restart kubelet
+</code></pre></div><p><strong>同时要保证 docker 的 cgroup 为 systemd</strong>，可以使用<code>docker info | grep -i cgroup</code>查看</p>
+<h2 id="部署集群">部署集群</h2>
+<h3 id="docker-拉取镜像配置">docker 拉取镜像配置</h3>
+<p>由于集群所需的 docker 镜像无法从国内直接获取，可配置代理或使用国内的仓库</p>
+<h4 id="方法-1-使用-docker-代理">方法 1-使用 docker 代理</h4>
+<p><a href="https://docs.docker.com/config/daemon/systemd/#httphttps-proxy#httphttps-proxy">docker 官方配置方法</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 创建文件夹和文件</span>
+sudo mkdir -p /etc/systemd/system/docker.service.d
+touch /etc/systemd/system/docker.service.d/http-proxy.conf
+
+<span style="color:#75715e"># 向文件添加代理配置</span>
+<span style="color:#f92672">[</span>Service<span style="color:#f92672">]</span>
+Environment<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;HTTP_PROXY=http://ip:port/&#34;</span>
+
+<span style="color:#75715e"># 保存配置并重启</span>
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+</code></pre></div><h4 id="方法-2-拉取阿里云镜像">方法 2-拉取阿里云镜像</h4>
+<p>参考：<a href="http://ljchen.net/2018/10/23/%E5%9F%BA%E4%BA%8E%E9%98%BF%E9%87%8C%E4%BA%91%E9%95%9C%E5%83%8F%E7%AB%99%E5%AE%89%E8%A3%85kubernetes/">基于阿里云镜像站安装 Kubernetes</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 编写脚本</span>
+<span style="color:#66d9ef">for</span> i in <span style="color:#e6db74">`</span>kubeadm config images list<span style="color:#e6db74">`</span>; <span style="color:#66d9ef">do</span>
+  imageName<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>i#k8s.gcr.io/<span style="color:#e6db74">}</span>
+  docker pull registry.aliyuncs.com/google_containers/$imageName
+  docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+  docker rmi registry.aliyuncs.com/google_containers/$imageName
+<span style="color:#66d9ef">done</span>;
+</code></pre></div><h3 id="配置-master-节点">配置 Master 节点</h3>
+<h4 id="init">init</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">kubeadm init --pod-network-cidr<span style="color:#f92672">=</span>10.20.0.0/16 --apiserver-advertise-address<span style="color:#f92672">=</span>192.168.1.201
+</code></pre></div><ul>
+<li><strong>&ndash;pod-network-cidr</strong>：用于第三方网络插件提供的子网范围。
+<ul>
+<li><strong>必须部署基于容器网络接口（CNI）的 Pod 网络附加组件，以便 Pod 可以相互通信</strong>。</li>
+<li>**确保您的 Pod 网络一定不能与任何主机网络重叠。**我选择的是 calico，默认是 192.168.0.0/16，所以修改了 cidr。</li>
+<li>参考<a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network">Installing a Pod network add-on</a></li>
+</ul>
+</li>
+<li><strong>&ndash;apiserver-advertise-address</strong>，(可选)，此处是为了保证多网卡下使用正确的 ip 地址</li>
+</ul>
+<p>init 的相关内容可参考<a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#initializing-your-control-plane-node">Initializing your control-plane node</a></p>
+<p><strong>init 输出内容如下</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>init<span style="color:#f92672">]</span> Using Kubernetes version: vX.Y.Z
+<span style="color:#f92672">[</span>preflight<span style="color:#f92672">]</span> Running pre-flight checks
+
+...
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown <span style="color:#66d9ef">$(</span>id -u<span style="color:#66d9ef">)</span>:<span style="color:#66d9ef">$(</span>id -g<span style="color:#66d9ef">)</span> $HOME/.kube/config
+
+You should now deploy a Pod network to the cluster.
+Run <span style="color:#e6db74">&#34;kubectl apply -f [podnetwork].yaml&#34;</span> with one of the options listed at:
+  /docs/concepts/cluster-administration/addons/
+
+You can now join any number of machines by running the following on each node
+as root:
+
+  kubeadm join &lt;control-plane-host&gt;:&lt;control-plane-port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;hash&gt;
+</code></pre></div><p><strong>确保记录</strong> <strong><code>kubeadm join &lt;control-plane-host&gt;:&lt;control-plane-port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></strong>，该命令用于从节点加入集群。</p>
+<p>为了使 kubectl 适用于您的非 root 用户，运行以下命令，它们也是 kubeadm init 输出的一部分</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown <span style="color:#66d9ef">$(</span>id -u<span style="color:#66d9ef">)</span>:<span style="color:#66d9ef">$(</span>id -g<span style="color:#66d9ef">)</span> $HOME/.kube/config
+</code></pre></div><h4 id="安装-pod-网络附加组件">安装 Pod 网络附加组件</h4>
+<p>命名为：<code>kubectl apply -f &lt;add-on.yaml&gt;</code>，此处选择使用<strong>Calico</strong>。由于<strong>init</strong>修改了默认子网</p>
+<p>下载 calico.yaml，地址：https://docs.projectcalico.org/v3.11/manifests/calico.yaml</p>
+<p>编辑 calico.yaml，搜索并修改默认配置(192.168.0.0/16)</p>
+<p><img src="../img/calico.yaml.png" alt="calico.yaml.png"></p>
+<p>使用<code>kubectl apply -f calico.yaml</code> 开始安装插件。</p>
+<p>使用<code>watch kubectl get pods --all-namespaces</code>查看安装情况</p>
+<h3 id="配置-slave-节点">配置 Slave 节点</h3>
+<p><strong>当前虚拟机环境下，需要保证每个节点的 hostname 不一样，否则不能加入集群</strong></p>
+<p>参考：<a href="https://geekflare.com/install-kubernetes-on-ubuntu/">How to Install Kubernetes on Ubuntu 18?</a></p>
+<h4 id="配置-hostname">配置 hostname</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 在master上设置hostname</span>
+sudo hostnamectl set-hostname k8s-m
+<span style="color:#75715e">#在两个slave上分别设置hostname</span>
+sudo hostnamectl set-hostname k8s-w1
+sudo hostnamectl set-hostname k8s-w2
+</code></pre></div><p>当安装完 master，且 slave 也有对应的 kube 环境时，将之前保存的那个命令在当前节点运行。</p>
+<p><code>kubeadm join &lt;control-plane-host&gt;:&lt;control-plane-port&gt; --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></p>
+<p><strong>注意</strong>：从节点也会有 <code>kubelet</code> 运行，所以依旧要保持 docker 和 kubeadm 的<code>cgroup-driver</code>都为<code>systemd</code></p>
+<p>正常加入后，显示如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[preflight] Running pre-flight checks
+
+... (log output of join workflow) ...
+
+Node join complete:
+* Certificate signing request sent to control-plane and response
+  received.
+* Kubelet informed of new secure connection details.
+
+Run &#39;kubectl get nodes&#39; on control-plane to see this machine join.
+</code></pre></div><p>在 master 查看节点</p>
+<p><img src="../img/get-nodes.png" alt="查看节点"></p>
+<h2 id="其他">其他</h2>
+<h3 id="kubeadm-集群的高可用">kubeadm 集群的高可用</h3>
+<p>在 init 时配置 <strong>&ndash;control-plane-endpoint</strong></p>
+<h3 id="单机集群">单机集群</h3>
+<p>默认情况下，出于安全原因，您的群集不会在控制平面节点上调度 Pod。如果您希望能够在控制平面节点上调度 Pod，例如用于单机 Kubernetes 集群进行开发，请运行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">kubectl taint nodes --all node-role.kubernetes.io/master-
+</code></pre></div><p>输出看起来像这样：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">node &#34;test-01&#34; untainted
+taint &#34;node-role.kubernetes.io/master:&#34; not found
+taint &#34;node-role.kubernetes.io/master:&#34; not found
+</code></pre></div><h3 id="将-api-服务器代理到本地主机">将 API 服务器代理到本地主机</h3>
+<p><code>kubectl proxy</code></p>
+<h3 id="清理">清理</h3>
+<p>如果您在群集中使用了一次性服务器进行测试，则可以关闭这些服务器，而无需进一步清理。您可以使用<code>kubectl config delete-cluster</code>删除对集群的本地引用。</p>
+<p>但是，如果您想更干净地清理群集，首先排空该节点并确保该节点为空，然后取消配置该节点。</p>
+<h4 id="删除节点">删除节点</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">kubectl drain &lt;node name&gt; --delete-local-data --force --ignore-daemonsets
+kubectl delete node &lt;node name&gt;
+</code></pre></div><p>通过 在需要清除的节点上运行<code>kubeadm reset</code>，进行重置</p>
+<p>重置过程不会重置或清除 iptables 规则或 IPVS 表。如果您希望重置 iptables，则必须手动进行。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">iptables -F <span style="color:#f92672">&amp;&amp;</span> iptables -t nat -F <span style="color:#f92672">&amp;&amp;</span> iptables -t mangle -F <span style="color:#f92672">&amp;&amp;</span> iptables -X
+</code></pre></div><p>如果要重置 IPVS 表，则必须运行命令：<code>ipvsadm -C</code></p>
+<h2 id="参考">参考</h2>
+<blockquote>
+<ul>
+<li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/">Installing kubeadm</a></li>
+<li><a href="https://blog.csdn.net/qq_34870631/article/details/78581891">SELinux、Netfilter、iptables、firewall 和 UFW 五者关系</a></li>
+<li><a href="https://docs.docker.com/config/daemon/systemd/#httphttps-proxy#httphttps-proxy">Control Docker with systemd - HTTP/HTTPS proxy</a></li>
+<li><a href="https://geekflare.com/install-kubernetes-on-ubuntu/">How to Install Kubernetes on Ubuntu 18?</a></li>
+<li><a href="https://www.jianshu.com/p/e43f5e848da1">从零开始搭建 Kubernetes 集群（三、搭建 K8S 集群）</a></li>
+<li><a href="https://developer.aliyun.com/mirror/">阿里云官方镜像站</a></li>
+</ul>
+</blockquote>
+</article>
+    </section>
+
+    <footer class="ui attached segment dream-tags">
+      
+        
+          <a class="ui label" href="/tags/k8s" title="k8s">k8s</a>
+        
+          <a class="ui label" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1" title="微服务">微服务</a>
+        
+      
+      <div
+        class="ui label"
+        style="float: right; background: #1b1c1d !important; cursor: pointer;"
+        onclick="savePostAsImg()">
+        <i class="save icon"></i> Save as image
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+  <div class="sixteen wide mobile sixteen wide tablet four wide computer column">
+    <article class="dream-header">
+  <section class="ui top attached center aligned segment">
+    <div class="ui small circular image">
+      
+    </div>
+
+    <h1 class="ui medium header">nio的博客<div class="sub header" style="margin-top: 0.5rem;"></div>
+    </h1>
+
+    <div class="ui horizontal list">
+      
+      <a class="item" href="/posts">
+        <i class="archive icon" title="归档"></i>
+      </a>
+      
+      <a class="item" href="/tags">
+        <i class="tags icon" title="所有标签"></i>
+      </a>
+      <a class="item" href="/categories">
+        <i class="th list icon" title="所有分类"></i>
+      </a>
+    </div>
+  </section>
+
+  
+  <section class="ui attached center aligned segment dream-tags">
+    
+      <a class="ui label" href="/tags/golang" title="golang">golang</a>
+    
+      <a class="ui label" href="/tags/k8s" title="k8s">k8s</a>
+    
+      <a class="ui label" href="/tags/rpc" title="rpc">rpc</a>
+    
+      <a class="ui label" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1" title="微服务">微服务</a>
+    
+  </section>
+  
+
+  
+  <section class="ui attached segment dream-categories">
+    <div class="ui accordion">
+      
+        <div class="title">
+          <i class="dropdown icon"></i>
+          <a href="/categories/golang" class="item">golang</a>
+        </div>
+        <div class="content">
+          <div class="ui list">
+          
+            <div class="item">
+              <div class="content">
+                <a href="https://nio755.github.io/posts/golang/golang%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="item">GoLang 逃逸分析</a>
+              </div>
+            </div>
+          
+          </div>
+        </div>
+      
+        <div class="title">
+          <i class="dropdown icon"></i>
+          <a href="/categories/grpc" class="item">grpc</a>
+        </div>
+        <div class="content">
+          <div class="ui list">
+          
+            <div class="item">
+              <div class="content">
+                <a href="https://nio755.github.io/posts/grpc/protocol-buffers%E5%9F%BA%E7%A1%80/" class="item">Protocol Buffers 使用</a>
+              </div>
+            </div>
+          
+          </div>
+        </div>
+      
+        <div class="title">
+          <i class="dropdown icon"></i>
+          <a href="/categories/k8s" class="item">k8s</a>
+        </div>
+        <div class="content">
+          <div class="ui list">
+          
+            <div class="item">
+              <div class="content">
+                <a href="https://nio755.github.io/posts/k8s/k8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="item">在 vmware 中使用 kubeadm 搭建 Kubernetes 集群</a>
+              </div>
+            </div>
+          
+          </div>
+        </div>
+      
+    </div>
+  </section>
+  
+
+  <section class="ui attached segment header-socials">
+    <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</nav>
+
+  </section>
+
+  <section class="ui bottom attached center aligned segment">
+    
+      <p>© 2020 nio`s Blog</p>
+    
+
+    <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</p>
+  </section>
+</article>
+
+  </div>
+</div>
+
+        </section>
+        <section class="back">
+          
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/nio755.github.io\/'"></i>
+  </div>
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+</nav>
+
+          <div class="ui centered relaxed grid dream-grid dream-back">
+  
+    <section class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+      <article>
+        <div class="ui top attached segment">
+          <h3 class="ui header">Desc</h3>
+        </div>
+        <div class="ui attached segment markdown-body">
+          <p>Hi, my name is nio.</p>
+<p>This is my blog.</p>
+
+        </div>
+      </article>
+    </section>
+  
+
+  <section class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article>
+      <div class="ui top attached segment">
+        <h3 class="ui header">社交链接</h3>
+      </div>
+      <div class="ui attached segment">
+        <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</nav>
+
+      </div>
+    </article>
+  </section>
+
+  <section class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    
+  </section>
+
+  
+  
+</div>
+
+        </section>
+      </div>
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+<script src="/js/semantic.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/theme.js"></script>
+<script src="/js/html2canvas.min.js"></script>
+
+
+
+  </body>
+</html>
