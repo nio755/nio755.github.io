@@ -6,10 +6,28 @@
     <description>Recent content in Tags on nio`s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 20 Apr 2020 09:08:15 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 25 Apr 2020 17:42:17 +0800</lastBuildDate>
     
 	<atom:link href="https://nio755.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>图像</title>
+      <link>https://nio755.github.io/tags/%E5%9B%BE%E5%83%8F/</link>
+      <pubDate>Sat, 25 Apr 2020 17:42:17 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/tags/%E5%9B%BE%E5%83%8F/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>算法</title>
+      <link>https://nio755.github.io/tags/%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Sat, 25 Apr 2020 17:42:17 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/tags/%E7%AE%97%E6%B3%95/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>rpc</title>

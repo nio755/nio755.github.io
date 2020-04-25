@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-Desc
+最近邻插值图片缩放(Nearest Neighbor Image Scaling)
 </title>
 
     
@@ -15,29 +15,27 @@ Desc
 
   
   <meta name="author" content="nio" />
-  <meta name="description" content="" />
+  <meta name="description" content="介绍 最近邻图像缩放(插值)算法是最简单、最快的图像缩放技术。当主要关心速度时，该算法非常有用。更加复杂的缩放算法有：双线性(bilinear" />
 
 
 
 <meta name="generator" content="Hugo 0.69.2" />
 
-<link rel="canonical" href="https://nio755.github.io/about/desc/" />
+<link rel="canonical" href="https://nio755.github.io/posts/algorithm/nearest-neighbor-interpolation/" />
 
 
-<meta property="og:title" content="Desc" />
-<meta property="og:description" content="Hi, my name is nio.
-This is my blog." />
+<meta property="og:title" content="最近邻插值图片缩放(Nearest Neighbor Image Scaling)" />
+<meta property="og:description" content="介绍 最近邻图像缩放(插值)算法是最简单、最快的图像缩放技术。当主要关心速度时，该算法非常有用。更加复杂的缩放算法有：双线性(bilinear" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://nio755.github.io/about/desc/" />
-<meta property="article:published_time" content="2020-04-19T20:44:07+08:00" />
-<meta property="article:modified_time" content="2020-04-19T20:44:07+08:00" />
+<meta property="og:url" content="https://nio755.github.io/posts/algorithm/nearest-neighbor-interpolation/" />
+<meta property="article:published_time" content="2020-04-25T17:42:17+08:00" />
+<meta property="article:modified_time" content="2020-04-25T17:42:17+08:00" />
 
 
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Desc"/>
-<meta name="twitter:description" content="Hi, my name is nio.
-This is my blog."/>
+<meta name="twitter:title" content="最近邻插值图片缩放(Nearest Neighbor Image Scaling)"/>
+<meta name="twitter:description" content="介绍 最近邻图像缩放(插值)算法是最简单、最快的图像缩放技术。当主要关心速度时，该算法非常有用。更加复杂的缩放算法有：双线性(bilinear"/>
 
 
 <link rel="stylesheet" href="/css/github-markdown.css" />
@@ -77,18 +75,49 @@ This is my blog."/>
     <section class="ui top attached segment" id="dream-save-post-as-img">
       <header style="margin-top: 0 !important;">
         <h2 class="ui header">
-          Desc
-          <div class="sub header">@ nio · Sunday, Apr 19, 2020 · 1 分钟阅读 · 更新于 Apr 19, 2020</div>
+          最近邻插值图片缩放(Nearest Neighbor Image Scaling)
+          <div class="sub header">@ nio · Saturday, Apr 25, 2020 · 2 分钟阅读 · 更新于 Apr 25, 2020</div>
         </h2>
       </header>
-      <article style="margin-top: 2rem;"><p>Hi, my name is nio.</p>
-<p>This is my blog.</p>
+      <article style="margin-top: 2rem;"><h2 id="介绍">介绍</h2>
+<p>最近邻图像缩放(插值)算法是最简单、最快的图像缩放技术。当主要关心速度时，该算法非常有用。更加复杂的缩放算法有：双线性(bilinear)插值、双三次(bicubic)插值、样条(spline)插值、sinc等。与最近邻插值不同，此其他变体使用邻近像素的插值，从而获得更平滑的图像。</p>
+<h2 id="原理">原理</h2>
+<p>缩放原理是 <strong>拥有一张参考图像，并以此图像作为基础来构造新的缩放图像。</strong> 根据缩放的比例，可获得不同比例的新图像。放大图像时，实际是在原始基础图片中引入空白区域。如下图，图像尺寸为(w1 = 4, h1 = 4)放大为(w2 = 8, h2 = 8)。黑色像素表示需要插值的空白区域，<code>complete</code>是最近邻插值的完整图片。</p>
+<p><img src="../img/nneighbor01.png" alt="最近邻插值示意图"></p>
+<p>算法通过寻找合适的点插入空白区域，并用最近邻像素替换这些空白区域。这会导致图像清晰但是会呈现锯齿状，如果放大倍数为2，则每个像素的大小将增加一倍。另一方面，缩小图像会减少像素意味着将丢失一些无法恢复的信息。这种情况下，缩放算法是要找到需要正确丢失的像素。</p>
+<p>算法只需要原始图像与(待缩放)图像间的水平和垂直比率。</p>
+<p><img src="../img/nneighbor-equ.gif" alt="图像比率求解"></p>
+<h2 id="代码示例">代码示例</h2>
+<ul>
+<li><a href="https://github.com/nio755/LearnLearnLearn/blob/master/Image/code/nearestNeighbor/nearestNeighbor.go">代码链接</a></li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">resize</span>(<span style="color:#a6e22e">img</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">Image</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span> <span style="color:#66d9ef">int</span>) <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">Image</span> {
+	<span style="color:#a6e22e">tmp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">NewRGBA</span>(<span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">Rect</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span>))
+	<span style="color:#a6e22e">x_ratio</span> <span style="color:#f92672">:=</span> float64(<span style="color:#a6e22e">img</span>.<span style="color:#a6e22e">Bounds</span>().<span style="color:#a6e22e">Dx</span>()) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">width</span>)
+	<span style="color:#a6e22e">y_ratio</span> <span style="color:#f92672">:=</span> float64(<span style="color:#a6e22e">img</span>.<span style="color:#a6e22e">Bounds</span>().<span style="color:#a6e22e">Dy</span>()) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">height</span>)
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">height</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">j</span> &lt; <span style="color:#a6e22e">width</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span> {
+			<span style="color:#a6e22e">px</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Floor</span>(float64(<span style="color:#a6e22e">j</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">x_ratio</span>)
+			<span style="color:#a6e22e">py</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Floor</span>(float64(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">y_ratio</span>)
+			<span style="color:#a6e22e">tmp</span>.<span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">j</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">img</span>.<span style="color:#a6e22e">At</span>(int(<span style="color:#a6e22e">px</span>), int(<span style="color:#a6e22e">py</span>)))
+		}
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tmp</span>
+}
+</code></pre></div><h2 id="参考">参考</h2>
+<ul>
+<li><a href="http://tech-algorithm.com/articles/nearest-neighbor-image-scaling/">Nearest Neighbor Image Scaling</a></li>
+</ul>
 </article>
     </section>
 
     <footer class="ui attached segment dream-tags">
       
-          <a class="ui label">暂无标签</a>
+        
+          <a class="ui label" href="/tags/%E5%9B%BE%E5%83%8F" title="图像">图像</a>
+        
+          <a class="ui label" href="/tags/%E7%AE%97%E6%B3%95" title="算法">算法</a>
+        
       
       <div
         class="ui label"
@@ -317,7 +346,6 @@ This is my blog."/>
 
   
   
-
 </div>
 
         </section>

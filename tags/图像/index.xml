@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>图像 on nio`s Blog</title>
+    <link>https://nio755.github.io/tags/%E5%9B%BE%E5%83%8F/</link>
+    <description>Recent content in 图像 on nio`s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 25 Apr 2020 17:42:17 +0800</lastBuildDate>
+    
+	<atom:link href="https://nio755.github.io/tags/%E5%9B%BE%E5%83%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>最近邻插值图片缩放(Nearest Neighbor Image Scaling)</title>
+      <link>https://nio755.github.io/posts/algorithm/nearest-neighbor-interpolation/</link>
+      <pubDate>Sat, 25 Apr 2020 17:42:17 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/posts/algorithm/nearest-neighbor-interpolation/</guid>
+      <description>介绍 最近邻图像缩放(插值)算法是最简单、最快的图像缩放技术。当主要关心速度时，该算法非常有用。更加复杂的缩放算法有：双线性(bilinear</description>
+    </item>
+    
+  </channel>
+</rss>
