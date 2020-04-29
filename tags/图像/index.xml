@@ -6,10 +6,19 @@
     <description>Recent content in 图像 on nio`s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 25 Apr 2020 17:42:17 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 29 Apr 2020 16:09:54 +0800</lastBuildDate>
     
 	<atom:link href="https://nio755.github.io/tags/%E5%9B%BE%E5%83%8F/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>双线性图像缩放(Bilinear Image Scaling)</title>
+      <link>https://nio755.github.io/posts/algorithm/bilinear-interpolation/</link>
+      <pubDate>Wed, 29 Apr 2020 16:09:54 +0800</pubDate>
+      
+      <guid>https://nio755.github.io/posts/algorithm/bilinear-interpolation/</guid>
+      <description>介绍 对比最近邻插值，双线性插值是基于周围像素来产生更平滑的缩放比例，通过取原图像中距离目标像素点最近的4个点，并对这4个点与其对应权值的乘积</description>
+    </item>
     
     <item>
       <title>最近邻插值图片缩放(Nearest Neighbor Image Scaling)</title>
